@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 // Import screens
@@ -10,24 +11,44 @@ import ScanClothesScreen from './src/screens/ScanClothesScreen';
 import OutfitsScreen from './src/screens/OutfitsScreen';
 import OnlineItemsScreen from './src/screens/OnlineItemsScreen';
 
-// Import database initialization
-import { initDatabase } from './src/services/database';
+// Import database context
+import { DatabaseProvider, useDatabaseContext } from './src/contexts/DatabaseContext';
 
 const Tab = createBottomTabNavigator();
 
-export default function App() {
-  React.useEffect(() => {
-    const initializeDatabase = async () => {
-      try {
-        await initDatabase();
-        console.log('Database initialized successfully');
-      } catch (error) {
-        console.error('Error initializing database:', error);
-      }
-    };
+const AppContent = () => {
+  const { isInitialized, isLoading, error } = useDatabaseContext();
 
-    initializeDatabase();
-  }, []);
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#3b82f6" />
+        <Text className="mt-4 text-lg text-gray-600">Initializing database...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white px-8">
+        <Ionicons name="warning-outline" size={64} color="#ef4444" />
+        <Text className="mt-4 text-xl font-bold text-red-600">Database Error</Text>
+        <Text className="mt-2 text-center text-gray-600">{error}</Text>
+        <Text className="mt-4 text-center text-sm text-gray-500">
+          Please restart the app to try again
+        </Text>
+      </View>
+    );
+  }
+
+  if (!isInitialized) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <Ionicons name="server-outline" size={64} color="#9CA3AF" />
+        <Text className="mt-4 text-lg text-gray-600">Setting up database...</Text>
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>
@@ -84,5 +105,13 @@ export default function App() {
         />
       </Tab.Navigator>
     </NavigationContainer>
+  );
+};
+
+export default function App() {
+  return (
+    <DatabaseProvider>
+      <AppContent />
+    </DatabaseProvider>
   );
 }

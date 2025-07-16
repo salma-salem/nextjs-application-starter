@@ -8,7 +8,7 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
-import { Camera } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { ClothingItem, ClothingCategory } from '../types';
@@ -19,19 +19,22 @@ const categories: ClothingCategory[] = ['tops', 'bottoms', 'shoes', 'accessories
 const colors = ['black', 'white', 'gray', 'red', 'blue', 'green', 'yellow', 'pink', 'purple', 'brown', 'orange'];
 
 const ScanClothesScreen = () => {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const [showCamera, setShowCamera] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [itemName, setItemName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ClothingCategory>('tops');
   const [selectedColor, setSelectedColor] = useState('black');
-  const cameraRef = useRef<Camera>(null);
+  const cameraRef = useRef<CameraView>(null);
 
   const requestCameraPermission = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(status === 'granted');
-    if (status === 'granted') {
+    if (!permission?.granted) {
+      const response = await requestPermission();
+      if (response.granted) {
+        setShowCamera(true);
+      }
+    } else {
       setShowCamera(true);
     }
   };
@@ -103,10 +106,10 @@ const ScanClothesScreen = () => {
   if (showCamera) {
     return (
       <View className="flex-1">
-        <Camera
+        <CameraView
           ref={cameraRef}
           style={{ flex: 1 }}
-          type="back"
+          facing="back"
         >
           <View className="flex-1 justify-end items-center pb-8">
             <View className="flex-row justify-around w-full px-8">
@@ -132,7 +135,7 @@ const ScanClothesScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </Camera>
+        </CameraView>
       </View>
     );
   }

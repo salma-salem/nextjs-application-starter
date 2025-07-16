@@ -11,31 +11,58 @@ const getDatabase = async (): Promise<SQLite.SQLiteDatabase> => {
 };
 
 export const initDatabase = async (): Promise<void> => {
-  const database = await getDatabase();
-  
-  // Create clothes table
-  await database.execAsync(`
-    CREATE TABLE IF NOT EXISTS clothes (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      category TEXT NOT NULL,
-      color TEXT NOT NULL,
-      imagePath TEXT NOT NULL,
-      dateAdded TEXT NOT NULL,
-      tags TEXT
-    );
-  `);
+  try {
+    console.log('Initializing database...');
+    const database = await getDatabase();
+    
+    console.log('Creating clothes table...');
+    // Create clothes table
+    await database.execAsync(`
+      CREATE TABLE IF NOT EXISTS clothes (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        color TEXT NOT NULL,
+        imagePath TEXT NOT NULL,
+        dateAdded TEXT NOT NULL,
+        tags TEXT
+      );
+    `);
 
-  // Create outfits table
-  await database.execAsync(`
-    CREATE TABLE IF NOT EXISTS outfits (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      items TEXT NOT NULL,
-      createdDate TEXT NOT NULL,
-      imagePreview TEXT
+    console.log('Creating outfits table...');
+    // Create outfits table
+    await database.execAsync(`
+      CREATE TABLE IF NOT EXISTS outfits (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        items TEXT NOT NULL,
+        createdDate TEXT NOT NULL,
+        imagePreview TEXT
+      );
+    `);
+
+    // Verify tables were created
+    console.log('Verifying table creation...');
+    const clothesTableInfo = await database.getAllAsync(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='clothes';"
     );
-  `);
+    const outfitsTableInfo = await database.getAllAsync(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='outfits';"
+    );
+
+    if (clothesTableInfo.length === 0) {
+      throw new Error('Failed to create clothes table');
+    }
+    if (outfitsTableInfo.length === 0) {
+      throw new Error('Failed to create outfits table');
+    }
+
+    console.log('Database initialization completed successfully');
+    console.log('Tables created:', { clothes: clothesTableInfo.length > 0, outfits: outfitsTableInfo.length > 0 });
+  } catch (error) {
+    console.error('Database initialization failed:', error);
+    throw error;
+  }
 };
 
 export const addClothingItem = async (item: ClothingItem): Promise<void> => {
