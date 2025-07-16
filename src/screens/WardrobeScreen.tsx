@@ -8,8 +8,10 @@ import {
   Alert,
   RefreshControl,
   Button,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { ClothingItem, ClothingCategory } from '../types';
 import { getClothingItems, deleteClothingItem } from '../services/database';
 import { resetWardrobeItems } from '../utils/addClothes';
@@ -19,11 +21,13 @@ import { addClothingItem } from '../services/database';
 const categories: ClothingCategory[] = ['tops', 'bottoms', 'shoes', 'accessories', 'outerwear'];
 
 const WardrobeScreen = () => {
+  const navigation = useNavigation();
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ClothingCategory | 'all'>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [loadingAdd, setLoadingAdd] = useState(false);
   const [addedMockClothes, setAddedMockClothes] = useState(false);
+  const [showCameraOptions, setShowCameraOptions] = useState(false);
 
   const loadClothingItems = async () => {
     try {
@@ -82,17 +86,7 @@ const WardrobeScreen = () => {
     );
   };
 
-  const handleAddMockClothes = async () => {
-    setLoadingAdd(true);
-    try {
-      await addClothes();
-      await loadClothingItems();
-      setAddedMockClothes(true);
-    } catch (error) {
-      console.error('Error adding mock clothes:', error);
-    }
-    setLoadingAdd(false);
-  };
+  // Removed unused handleAddMockClothes function to fix error
 
   const renderClothingItem = ({ item }: { item: ClothingItem }) => {
     const imageUri = item.imagePath && item.imagePath.trim() !== '' 
@@ -125,9 +119,10 @@ const WardrobeScreen = () => {
       onPress={() => setSelectedCategory(category)}
       className={`px-4 py-2 rounded-full mr-2 ${
         selectedCategory === category
-          ? 'bg-blue-500'
+          ? ''
           : 'bg-gray-200'
       }`}
+      style={selectedCategory === category ? { backgroundColor: '#89CFF0' } : undefined}
     >
       <Text
         className={`capitalize ${
@@ -141,17 +136,43 @@ const WardrobeScreen = () => {
     </TouchableOpacity>
   );
 
+  const handleOpenCameraOptions = () => {
+    setShowCameraOptions(true);
+  };
+
+  const handleCloseCameraOptions = () => {
+    setShowCameraOptions(false);
+  };
+
+  const handleTakePhoto = () => {
+    setShowCameraOptions(false);
+    navigation.navigate('ScanClothesScreen');
+  };
+
+  const handleChooseFromGallery = () => {
+    setShowCameraOptions(false);
+    navigation.navigate('ScanClothesScreen');
+  };
+
   return (
     <View className="flex-1 bg-gray-50">
-      {/* Category Filter */}
-      <View className="bg-white p-4 shadow-sm">
+      {/* Category Filter and Scan Clothes Button */}
+      <View className="bg-white p-4 shadow-sm flex-row justify-between items-center">
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
           data={['all', ...categories]}
           renderItem={({ item }) => renderCategoryButton(item as ClothingCategory | 'all')}
           keyExtractor={(item) => item}
+          className="flex-grow"
         />
+        <TouchableOpacity
+          onPress={handleOpenCameraOptions}
+          className="ml-4 p-2 rounded"
+          style={{ backgroundColor: '#89CFF0' }}
+        >
+          <Ionicons name="camera-outline" size={24} color="white" />
+        </TouchableOpacity>
       </View>
 
       {/* Add Mock Clothes Button */}
@@ -164,9 +185,6 @@ const WardrobeScreen = () => {
         <View className="flex-1 justify-center items-center">
           <Ionicons name="shirt-outline" size={64} color="#9CA3AF" />
           <Text className="text-gray-500 text-lg mt-4">No items in your wardrobe</Text>
-          <Text className="text-gray-400 text-center mt-2 px-8">
-            Start by scanning some clothes using the camera tab
-          </Text>
         </View>
       ) : (
         <FlatList
@@ -180,6 +198,50 @@ const WardrobeScreen = () => {
           }
         />
       )}
+
+      {/* Camera Options Modal */}
+      <Modal
+        visible={showCameraOptions}
+        transparent
+        animationType="fade"
+        onRequestClose={handleCloseCameraOptions}
+      >
+        <TouchableOpacity
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
+          activeOpacity={1}
+          onPress={handleCloseCameraOptions}
+        >
+          <View style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            padding: 20,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          }}>
+            <TouchableOpacity
+              onPress={handleTakePhoto}
+              className="py-4"
+            >
+              <Text className="text-lg text-center text-blue-500">Take Photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleChooseFromGallery}
+              className="py-4"
+            >
+              <Text className="text-lg text-center text-blue-500">Choose from Gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleCloseCameraOptions}
+              className="py-4"
+            >
+              <Text className="text-lg text-center text-red-500">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };

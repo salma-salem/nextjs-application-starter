@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { addClothingItem, deleteClothingItem, getClothingItems } from '../services/database';
 import { ClothingItem } from '../types';
+import { mockWardrobeItems } from './mockWardrobeItems';
 
 export const resetWardrobeItems = async () => {
   try {
@@ -10,11 +11,7 @@ export const resetWardrobeItems = async () => {
       await deleteClothingItem(item.id);
     }
 
-    const currentDate = new Date().toISOString();
-
-    const clothesToAdd: ClothingItem[] = [
-
-    ];
+    const clothesToAdd: ClothingItem[] = mockWardrobeItems;
 
     for (const item of clothesToAdd) {
       await addClothingItem(item);

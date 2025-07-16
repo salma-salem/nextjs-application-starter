@@ -3,7 +3,7 @@ import { ClothingItem } from '../types';
 export const mockWardrobeItems: ClothingItem[] = [
   {
     id: '1',
-    name: "Man's Blue Shirt",
+    name: "Blue Shirt",
     category: 'tops',
     color: 'blue',
     imagePath: 'https://m.media-amazon.com/images/I/519-6fgzdQL._UY1000_.jpg',
@@ -15,17 +15,26 @@ export const mockWardrobeItems: ClothingItem[] = [
     name: 'White T-Shirt',
     category: 'tops',
     color: 'white',
-    imagePath: 'https://cdn.pixabay.com/photo/2016/03/31/19/56/t-shirt-1296314_1280.png',
+    imagePath: 'https://m.media-amazon.com/images/I/41uF42-1WwL._UY1000_.jpg',
     dateAdded: new Date().toISOString(),
     tags: [],
   },
   {
     id: '3',
-    name: 'Jeans',
+    name: 'Shorts',
     category: 'bottoms',
-    color: 'blue',
-    imagePath: 'https://example.com/jeans-placeholder.jpg',
+    color: 'black',
+    imagePath: 'https://m.media-amazon.com/images/I/618l+TYkF3L._AC_SX679_.jpg',
     dateAdded: new Date().toISOString(),
     tags: [],
   },
+  {
+    id: '4',
+    name: 'Fishing Short',
+    category: 'bottoms',
+    color: 'beige',
+    imagePath: 'https://m.media-amazon.com/images/I/51ZoGBlWEgL._AC_SX679_.jpg',
+    dateAdded: new Date().toISOString(),
+    tags: [],
+  }
 ];
