@@ -1148,7 +1148,7 @@
   resolved "https://registry.yarnpkg.com/@expo/sudo-prompt/-/sudo-prompt-9.3.2.tgz#0fd2813402a42988e49145cab220e25bea74b308"
   integrity sha512-HHQigo3rQWKMDzYDLkubN5WQOYXJJE2eNqIQC2axC2iO3mHdwnIR7FgZVvHWtBwAdzBgAP0ECp8KqS8TiMKvgw==
 
-"@expo/vector-icons@^14.0.0", "@expo/vector-icons@^15.0.0":
+"@expo/vector-icons@^14.0.0", "@expo/vector-icons@^14.1.0":
   version "14.1.0"
   resolved "https://registry.yarnpkg.com/@expo/vector-icons/-/vector-icons-14.1.0.tgz#d3dddad8b6ea60502e0fe5485b86751827606ce4"
   integrity sha512-7T09UE9h8QDTsUeMGymB4i+iqvtEeaO5VvUjryFB4tugDTG/bkzViWA74hm5pfjjDEhYMXWaX112mcvhccmIwQ==
@@ -2593,10 +2593,10 @@ expo-asset@~11.1.7:
     "@expo/image-utils" "^0.7.6"
     expo-constants "~17.1.7"
 
-expo-camera@~17.0.0:
-  version "16.1.11-canary-20250713-8f814f8"
-  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-16.1.11-canary-20250713-8f814f8.tgz#d2f33eb35b6e6c4dcfa3533323e4f195f7ac8925"
-  integrity sha512-OLEU+wJOk2bMuPnvRX1ZBpXGCy0lYiBYphSCvd2NP6KRVrXEAMir+Ro5aexau7TZKLUQqFxuMtRldkxSgWNZOQ==
+expo-camera@~16.1.0:
+  version "16.1.10"
+  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-16.1.10.tgz#56dd7abc118b4de1771e6b64739197c2277f4083"
+  integrity sha512-qoRJeSwPmMbuu0VfnQTC+q79Kt2SqTWColEImgithL9u0qUQcC55U89IfhZk55Hpt6f1DgKuDzUOG5oY+snSWg==
   dependencies:
     invariant "^2.2.4"
 
@@ -2637,7 +2637,7 @@ expo-keep-awake@~14.1.4:
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-14.1.4.tgz#80197728563e0e17523e5a606fbd6fbed9639503"
   integrity sha512-wU9qOnosy4+U4z/o4h8W9PjPvcFMfZXrlUoKTMBW7F4pLqhkkP/5G4EviPZixv4XWFMjn1ExQ5rV6BX8GwJsWA==
 
-expo-linear-gradient@~15.0.0:
+expo-linear-gradient@~14.1.6:
   version "14.1.6-canary-20250713-8f814f8"
   resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-14.1.6-canary-20250713-8f814f8.tgz#0cca283340b0480d18a312b601b324da0e32e6ef"
   integrity sha512-uULuGPpad46Y9nkaUHj02NNlBJP8Cz/kFa6XY/begb7ZIwKj6/KBGR3f2VNZ64hk+LsT/USyRbM4VchZAJ2hbw==
@@ -2662,10 +2662,10 @@ expo-modules-core@2.4.2:
   dependencies:
     invariant "^2.2.4"
 
-expo-sqlite@~16.0.0:
-  version "15.2.15-canary-20250713-8f814f8"
-  resolved "https://registry.yarnpkg.com/expo-sqlite/-/expo-sqlite-15.2.15-canary-20250713-8f814f8.tgz#e8a2690ad05d78cbbb2112a36ceb714f3a3eb59c"
-  integrity sha512-5V8+GV3e0bWHo133x1LkF5McvkzmI4VldaqKhzWnb3mT+p4qvt3n16L6pGQ7kN+diOrv3JuJVSRyqVemBfmYoQ==
+expo-sqlite@~15.2.0:
+  version "15.2.14"
+  resolved "https://registry.yarnpkg.com/expo-sqlite/-/expo-sqlite-15.2.14.tgz#53a63d1bab5e6ab3f5e515bf79d2070dd4fe08c4"
+  integrity sha512-6tWnEE0fcir30/e7eVwjeC7eKdncfVnIgo2JvnKpRndedyiFMXLMyOQWNVGnuhnSrPV2BHvGGjLByS/j5VgH4w==
   dependencies:
     await-lock "^2.2.2"
 
