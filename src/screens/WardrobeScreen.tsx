@@ -7,16 +7,14 @@ import {
   Image,
   Alert,
   RefreshControl,
-  Button,
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { ClothingItem, ClothingCategory } from '../types';
-import { getClothingItems, deleteClothingItem } from '../services/database';
+import { getClothingItems, deleteClothingItem, addClothingItem } from '../services/database';
 import { resetWardrobeItems } from '../utils/addClothes';
 import { mockWardrobeItems } from '../utils/mockWardrobeItems';
-import { addClothingItem } from '../services/database';
 
 const categories: ClothingCategory[] = ['tops', 'bottoms', 'shoes', 'accessories', 'outerwear'];
 
@@ -25,8 +23,6 @@ const WardrobeScreen = () => {
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ClothingCategory | 'all'>('all');
   const [refreshing, setRefreshing] = useState(false);
-  const [loadingAdd, setLoadingAdd] = useState(false);
-  const [addedMockClothes, setAddedMockClothes] = useState(false);
   const [showCameraOptions, setShowCameraOptions] = useState(false);
 
   const loadClothingItems = async () => {
@@ -38,16 +34,17 @@ const WardrobeScreen = () => {
     }
   };
 
-  const handleAddMockWardrobeItems = async () => {
-    setLoadingAdd(true);
+  const initializeWardrobe = async () => {
     try {
-      await resetWardrobeItems();
-      await loadClothingItems();
-      setAddedMockClothes(true);
+      const existingItems = await getClothingItems();
+      if (existingItems.length === 0) {
+        for (const item of mockWardrobeItems) {
+          await addClothingItem(item);
+        }
+      }
     } catch (error) {
-      console.error('Error adding mock wardrobe items:', error);
+      console.error('Error initializing wardrobe:', error);
     }
-    setLoadingAdd(false);
   };
 
   const onRefresh = async () => {
@@ -57,7 +54,10 @@ const WardrobeScreen = () => {
   };
 
   useEffect(() => {
-    loadClothingItems();
+    (async () => {
+      await initializeWardrobe();
+      await loadClothingItems();
+    })();
   }, []);
 
   const filteredItems = selectedCategory === 'all' 
@@ -85,8 +85,6 @@ const WardrobeScreen = () => {
       ]
     );
   };
-
-  // Removed unused handleAddMockClothes function to fix error
 
   const renderClothingItem = ({ item }: { item: ClothingItem }) => {
     const imageUri = item.imagePath && item.imagePath.trim() !== '' 
@@ -175,11 +173,6 @@ const WardrobeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Add Mock Clothes Button */}
-      <View className="p-4">
-        <Button title={loadingAdd ? "Adding Clothes..." : ""} onPress={handleAddMockWardrobeItems} disabled={loadingAdd || addedMockClothes} />
-      </View>
-
       {/* Clothing Items Grid */}
       {filteredItems.length === 0 ? (
         <View className="flex-1 justify-center items-center">
@@ -241,6 +234,53 @@ const WardrobeScreen = () => {
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
+      </Modal>
+            {/* New Post Modal */}
+            <Modal visible={newPostModalVisible} animationType="slide" transparent>
+        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
+          <View className="bg-white rounded-lg p-5 w-11/12">
+            <Text className="text-xl font-bold mb-4">Create New Post</Text>
+            <ScrollView>
+              <TextInput
+                placeholder="Title"
+                value={newPost.title}
+                onChangeText={text => setNewPost(prev => ({ ...prev, title: text }))}
+                className="border p-2 mb-3 rounded"
+              />
+              <TextInput
+                placeholder="Topic"
+                value={newPost.topic}
+                onChangeText={text => setNewPost(prev => ({ ...prev, topic: text }))}
+                className="border p-2 mb-3 rounded"
+              />
+              <View className="border p-2 mb-3 rounded h-[170px] relative justify-center items-center">
+                <TextInput
+                  placeholder="Image URL"
+                  value={newPost.imageUrl}
+                  onChangeText={text => setNewPost(prev => ({ ...prev, imageUrl: text }))}
+                  className="absolute top-0 left-0 right-0 bottom-0 px-2"
+                />
+                <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+              </View>
+              {newPost.imageUrl ? (
+                <Image source={{ uri: newPost.imageUrl }} className="w-full h-40 rounded mb-3" resizeMode="cover" />
+              ) : null}
+              <TextInput
+                placeholder="Description"
+                value={newPost.description}
+                onChangeText={text => setNewPost(prev => ({ ...prev, description: text }))}
+                className="border p-2 mb-3 rounded"
+                multiline
+              />
+              <TouchableOpacity onPress={handleCreatePost} className="bg-blue-500 py-2 rounded">
+                <Text className="text-center text-white font-semibold">Publish</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setNewPostModalVisible(false)} className="mt-3">
+                <Text className="text-center text-gray-600">Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
       </Modal>
     </View>
   );
