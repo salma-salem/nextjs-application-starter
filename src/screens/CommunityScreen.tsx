@@ -25,8 +25,8 @@ interface CommunityPost {
 const mockCommunityPosts: CommunityPost[] = [
   {
     id: '1',
-    title: 'Do I look good with this t-shirt?',
-    topic: 'Styling Tips',
+    title: 'Street Style Today',
+    topic: 'OOTD',
     imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400',
     user: 'stylebyjane',
     description: 'Loving this comfy but trendy look I wore downtown today!',
@@ -34,7 +34,7 @@ const mockCommunityPosts: CommunityPost[] = [
   },
   {
     id: '2',
-    title: 'Selling 2 pair of jeans, almost brand new',
+    title: 'Selling 2 pair of jeans',
     topic: '2Hand',
     imageUrl: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400',
     user: 'eco_chic',
@@ -52,7 +52,7 @@ const mockCommunityPosts: CommunityPost[] = [
   },
   {
     id: '4',
-    title: 'How should I match this? Help pleaseee',
+    title: 'How should I  this?',
     topic: 'Styling Tips',
     imageUrl: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400',
     user: 'minimalfit',
@@ -61,7 +61,7 @@ const mockCommunityPosts: CommunityPost[] = [
   },
   {
     id: '5',
-    title: 'My AMAZING Graduation day!',
+    title: 'Graduation day!',
     topic: 'OOTD',
     imageUrl: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400',
     user: 'mamamia',
@@ -89,6 +89,13 @@ const CommunityScreen = () => {
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [activePost, setActivePost] = useState<CommunityPost | null>(null);
   const [newComment, setNewComment] = useState('');
+  const [newPostModalVisible, setNewPostModalVisible] = useState(false);
+  const [newPost, setNewPost] = useState({
+    title: '',
+    topic: '',
+    imageUrl: '',
+    description: '',
+  });
 
   useEffect(() => {
     filterPosts();
@@ -128,6 +135,22 @@ const CommunityScreen = () => {
     setPosts(updatedPosts);
     setNewComment('');
     setCommentModalVisible(false);
+  };
+
+  const handleCreatePost = () => {
+    if (!newPost.title || !newPost.topic || !newPost.imageUrl || !newPost.description) {
+      Alert.alert('Error', 'Please fill out all fields');
+      return;
+    }
+    const createdPost: CommunityPost = {
+      ...newPost,
+      id: Date.now().toString(),
+      user: 'me',
+      comments: [],
+    };
+    setPosts([createdPost, ...posts]);
+    setNewPost({ title: '', topic: '', imageUrl: '', description: '' });
+    setNewPostModalVisible(false);
   };
 
   const renderPost = ({ item }: { item: CommunityPost }) => (
@@ -179,24 +202,31 @@ const CommunityScreen = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <View className="bg-white p-4 shadow-sm">
-        <View className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2 mb-3">
-          <Ionicons name="search" size={20} color="#9CA3AF" />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search posts or users..."
-            className="flex-1 ml-2 text-gray-700"
-          />
+      <View className="bg-white p-4 shadow-sm flex-row justify-between items-center">
+        <View className="flex-1 mr-2">
+          <View className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
+            <Ionicons name="search" size={20} color="#9CA3AF" />
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search posts or users..."
+              className="flex-1 ml-2 text-gray-700"
+            />
+          </View>
         </View>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={['all', ...topics]}
-          renderItem={({ item }) => renderTopicButton(item)}
-          keyExtractor={(item) => item}
-        />
+        <TouchableOpacity className="p-2" onPress={() => setNewPostModalVisible(true)}>
+          <Ionicons name="add-circle-outline" size={28} color="#2563EB" />
+        </TouchableOpacity>
       </View>
+
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={['all', ...topics]}
+        renderItem={({ item }) => renderTopicButton(item)}
+        keyExtractor={(item) => item}
+        contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 4 }}
+      />
 
       {filteredPosts.length === 0 ? (
         <View className="flex-1 justify-center items-center">
@@ -249,6 +279,54 @@ const CommunityScreen = () => {
             >
               <Text className="text-gray-600">Close</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* New Post Modal */}
+      <Modal visible={newPostModalVisible} animationType="slide" transparent>
+        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
+          <View className="bg-white rounded-lg p-5 w-11/12">
+            <Text className="text-xl font-bold mb-4">Create New Post</Text>
+            <ScrollView>
+              <TextInput
+                placeholder="Title"
+                value={newPost.title}
+                onChangeText={text => setNewPost(prev => ({ ...prev, title: text }))}
+                className="border p-2 mb-3 rounded"
+              />
+              <TextInput
+                placeholder="Topic"
+                value={newPost.topic}
+                onChangeText={text => setNewPost(prev => ({ ...prev, topic: text }))}
+                className="border p-2 mb-3 rounded"
+              />
+              <View className="border p-2 mb-3 rounded h-[170px] relative justify-center items-center">
+                <TextInput
+                  placeholder="Image URL"
+                  value={newPost.imageUrl}
+                  onChangeText={text => setNewPost(prev => ({ ...prev, imageUrl: text }))}
+                  className="absolute top-0 left-0 right-0 bottom-0 px-2"
+                />
+                <Ionicons name="image-outline" size={32} color="#9CA3AF" />
+              </View>
+              {newPost.imageUrl ? (
+                <Image source={{ uri: newPost.imageUrl }} className="w-full h-40 rounded mb-3" resizeMode="cover" />
+              ) : null}
+              <TextInput
+                placeholder="Description"
+                value={newPost.description}
+                onChangeText={text => setNewPost(prev => ({ ...prev, description: text }))}
+                className="border p-2 mb-3 rounded"
+                multiline
+              />
+              <TouchableOpacity onPress={handleCreatePost} className="bg-blue-500 py-2 rounded">
+                <Text className="text-center text-white font-semibold">Publish</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setNewPostModalVisible(false)} className="mt-3">
+                <Text className="text-center text-gray-600">Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </View>
       </Modal>
