@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import * as Camera from 'expo-camera';
 import { ClothingItem, ClothingCategory } from '../types';
 import { getClothingItems, deleteClothingItem, addClothingItem } from '../services/database';
-import { resetWardrobeItems } from '../utils/addClothes';
 import { mockWardrobeItems } from '../utils/mockWardrobeItems';
 
 const categories: ClothingCategory[] = ['tops', 'bottoms', 'shoes', 'accessories', 'outerwear'];
@@ -86,6 +87,55 @@ const WardrobeScreen = () => {
     );
   };
 
+  const handleOpenCameraOptions = () => {
+    setShowCameraOptions(true);
+  };
+
+  const handleCloseCameraOptions = () => {
+    setShowCameraOptions(false);
+  };
+
+  const handleTakePhoto = async () => {
+    setShowCameraOptions(false);
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Camera permission is required to take a photo.');
+      return;
+    }
+  
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaType.IMAGE, // <-- cambiado aquí
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      navigation.navigate('ScanClothesScreen', { imageUri: result.assets[0].uri });
+    }
+  };
+  
+  const handleChooseFromGallery = async () => {
+    setShowCameraOptions(false);
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Gallery access is required to select an image.');
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType.IMAGE, // <-- cambiado aquí también
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      navigation.navigate('ScanClothesScreen', { imageUri: result.assets[0].uri });
+    }
+  };
+  
+
   const renderClothingItem = ({ item }: { item: ClothingItem }) => {
     const imageUri = item.imagePath && item.imagePath.trim() !== '' 
       ? item.imagePath 
@@ -116,41 +166,19 @@ const WardrobeScreen = () => {
       key={category}
       onPress={() => setSelectedCategory(category)}
       className={`px-4 py-2 rounded-full mr-2 ${
-        selectedCategory === category
-          ? ''
-          : 'bg-gray-200'
+        selectedCategory === category ? '' : 'bg-gray-200'
       }`}
       style={selectedCategory === category ? { backgroundColor: '#89CFF0' } : undefined}
     >
       <Text
         className={`capitalize ${
-          selectedCategory === category
-            ? 'text-white font-semibold'
-            : 'text-gray-700'
+          selectedCategory === category ? 'text-white font-semibold' : 'text-gray-700'
         }`}
       >
         {category}
       </Text>
     </TouchableOpacity>
   );
-
-  const handleOpenCameraOptions = () => {
-    setShowCameraOptions(true);
-  };
-
-  const handleCloseCameraOptions = () => {
-    setShowCameraOptions(false);
-  };
-
-  const handleTakePhoto = () => {
-    setShowCameraOptions(false);
-    navigation.navigate('ScanClothesScreen');
-  };
-
-  const handleChooseFromGallery = () => {
-    setShowCameraOptions(false);
-    navigation.navigate('ScanClothesScreen');
-  };
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -234,53 +262,6 @@ const WardrobeScreen = () => {
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
-      </Modal>
-            {/* New Post Modal */}
-            <Modal visible={newPostModalVisible} animationType="slide" transparent>
-        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
-          <View className="bg-white rounded-lg p-5 w-11/12">
-            <Text className="text-xl font-bold mb-4">Create New Post</Text>
-            <ScrollView>
-              <TextInput
-                placeholder="Title"
-                value={newPost.title}
-                onChangeText={text => setNewPost(prev => ({ ...prev, title: text }))}
-                className="border p-2 mb-3 rounded"
-              />
-              <TextInput
-                placeholder="Topic"
-                value={newPost.topic}
-                onChangeText={text => setNewPost(prev => ({ ...prev, topic: text }))}
-                className="border p-2 mb-3 rounded"
-              />
-              <View className="border p-2 mb-3 rounded h-[170px] relative justify-center items-center">
-                <TextInput
-                  placeholder="Image URL"
-                  value={newPost.imageUrl}
-                  onChangeText={text => setNewPost(prev => ({ ...prev, imageUrl: text }))}
-                  className="absolute top-0 left-0 right-0 bottom-0 px-2"
-                />
-                <Ionicons name="image-outline" size={32} color="#9CA3AF" />
-              </View>
-              {newPost.imageUrl ? (
-                <Image source={{ uri: newPost.imageUrl }} className="w-full h-40 rounded mb-3" resizeMode="cover" />
-              ) : null}
-              <TextInput
-                placeholder="Description"
-                value={newPost.description}
-                onChangeText={text => setNewPost(prev => ({ ...prev, description: text }))}
-                className="border p-2 mb-3 rounded"
-                multiline
-              />
-              <TouchableOpacity onPress={handleCreatePost} className="bg-blue-500 py-2 rounded">
-                <Text className="text-center text-white font-semibold">Publish</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setNewPostModalVisible(false)} className="mt-3">
-                <Text className="text-center text-gray-600">Cancel</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
       </Modal>
     </View>
   );
