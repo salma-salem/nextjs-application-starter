@@ -316,6 +316,7 @@ const CommunityScreen = () => {
               <TouchableOpacity onPress={() => setNewPostModalVisible(false)}>
                 <Text className="text-gray-600">Cancel</Text>
               </TouchableOpacity>
+              
             </View>
           </View>
         </View>
