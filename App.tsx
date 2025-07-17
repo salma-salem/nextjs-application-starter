@@ -15,6 +15,7 @@ import StylistScreen from './src/screens/StylistScreen';
 
 // Import database context
 import { DatabaseProvider, useDatabaseContext } from './src/contexts/DatabaseContext';
+import CommunityScreen from '@/screens/CommunityScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -97,7 +98,7 @@ const AppContent = () => {
         />
         <Tab.Screen 
           name="Online" 
-          component={OnlineItemsScreen}
+          component={CommunityScreen}
           options={{ title: 'Community' }}
         />
         <Tab.Screen
