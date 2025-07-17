@@ -10,6 +10,7 @@ import {
   Pressable,
 } from 'react-native';
 import React, { useState, useRef } from 'react';
+import { mockWardrobeItems } from '../utils/mockWardrobeItems';
 
 const brands = ['Brand A', 'Brand B', 'Brand C'];
 const prices = ['All', 'Low', 'Medium', 'High'];
@@ -140,7 +141,7 @@ const renderDropdown = (
   ) => (
     <View style={{ marginBottom: 10 }}>
       <Text style={{ fontWeight: 'bold', marginBottom: 5 }}>{label} from</Text>
-      <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: '#007AFF', borderRadius: 5, overflow: 'hidden' }}>
+      <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: '#89CFF0', borderRadius: 5, overflow: 'hidden' }}>
         {['wardrobe', 'newItem'].map((option) => (
           <TouchableOpacity
             key={option}
@@ -148,7 +149,7 @@ const renderDropdown = (
             style={{
               flex: 1,
               padding: 8,
-              backgroundColor: source === option ? '#007AFF' : '#fff',
+              backgroundColor: source === option ? '#89CFF0' : '#fff',
               alignItems: 'center',
             }}
           >
@@ -169,8 +170,30 @@ const renderDropdown = (
       (!selectedStyle.length || selectedStyle.includes(item.style))
     );
 
-  const filteredTops = filterItems(mockTops);
-  const filteredBottoms = filterItems(mockBottoms);
+  
+
+const wardrobeTops = mockWardrobeItems.filter(item => item.category === 'tops').map(item => ({
+  id: item.id,
+  name: item.name,
+  brand: '',
+  price: 'Low', // or a default
+  color: item.color,
+  style: '',
+  image: item.imagePath,
+}));
+
+const filteredTops = filterItems(topSource === 'wardrobe' ? wardrobeTops : mockTops);
+  const wardrobeBottoms = mockWardrobeItems.filter(item => item.category === 'bottoms').map(item => ({
+  id: item.id,
+  name: item.name,
+  brand: '',
+  price: 'Low',
+  color: item.color,
+  style: '',
+  image: item.imagePath,
+}));
+
+const filteredBottoms = filterItems(bottomSource === 'wardrobe' ? wardrobeBottoms : mockBottoms);
 
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: '#fff' }}>
@@ -193,13 +216,13 @@ const renderDropdown = (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Animated.View {...topPanResponder.panHandlers} style={[{ marginBottom: 20 }, topPan.getLayout()]}>
           <TouchableOpacity onPress={() => { setModalItem(filteredTops[topIndex % filteredTops.length]); setModalVisible(true); }}>
-            <Image source={{ uri: filteredTops[topIndex % filteredTops.length]?.image }} style={{ width: 180, height: 180, resizeMode: 'contain' }} />
+            <Image source={{ uri: filteredTops[topIndex % filteredTops.length]?.image }} style={{ width: 190, height: 190, resizeMode: 'contain' }} />
           </TouchableOpacity>
         </Animated.View>
 
         <Animated.View {...bottomPanResponder.panHandlers} style={[bottomPan.getLayout()]}>
           <TouchableOpacity onPress={() => { setModalItem(filteredBottoms[bottomIndex % filteredBottoms.length]); setModalVisible(true); }}>
-            <Image source={{ uri: filteredBottoms[bottomIndex % filteredBottoms.length]?.image }} style={{ width: 180, height: 180, resizeMode: 'contain' }} />
+            <Image source={{ uri: filteredBottoms[bottomIndex % filteredBottoms.length]?.image }} style={{ width: 190, height: 190, resizeMode:'contain' }} />
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -212,9 +235,16 @@ const renderDropdown = (
             <Text>Brand: {modalItem?.brand}</Text>
             <Text>Price: {modalItem?.price}</Text>
             <Text>Style: {modalItem?.style}</Text>
-            <Pressable onPress={() => setModalVisible(false)} style={{ marginTop: 20, backgroundColor: '#007AFF', padding: 10, borderRadius: 5 }}>
-              <Text style={{ color: '#fff', textAlign: 'center' }}>Close</Text>
-            </Pressable>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 20 }}>
+  <Pressable onPress={() => setModalVisible(false)} style={{ backgroundColor: '#89CFF0', padding: 10, borderRadius: 5 }}>
+    <Text style={{ color: '#fff', textAlign: 'center' }}>Close</Text>
+  </Pressable>
+  {modalItem?.brand && (
+    <Pressable onPress={() => console.log('Add to cart')} style={{ backgroundColor: '#89CFF0', paddingVertical: 10, paddingHorizontal: 15, borderRadius: 5 }}>
+  <Text style={{ color: '#fff', fontWeight: 'bold' }}>🛒</Text>
+</Pressable>
+  )}
+</View>
           </View>
         </View>
       </Modal>
